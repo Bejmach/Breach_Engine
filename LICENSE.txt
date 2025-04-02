@@ -1,0 +1,16 @@
+Breach License (BL-1.0)  
+
+Copyright (c) 2025 Maciej Bejmowicz 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software (the "Software"), to use the Software under the following conditions:
+
+1. **No Modifications** – The Software **must not be modified, altered, or used to create derivative works**(With exception of the parts of the program under different licenses).
+2. **No Redistribution** – The Software **may not be distributed, shared, or made available to third parties** under any circumstances.
+3. **Personal Use and Ownership** – Any works, creations, or products made using this Software are the **exclusive property** of the user, and the creator of the Software (the author) **has no rights or claims** to any creations made using this Software.
+4. **No Merging or Combination** – The Software **may not be merged, linked, or combined** with other software to create a new product.
+5. **Commercial Use** – The Software **may be used for commercial purposes**, but the above restrictions still apply.
+6. **License Inclusion** – A copy of this license must be included with any distribution of the Software, but redistribution is prohibited.
+7. **No Warranty** – THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. THE AUTHOR SHALL NOT BE LIABLE FOR ANY CLAIMS, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+8. **No Patent License** – This license does **not** grant any patent rights.
+
+By using this Software, you agree to the terms of this license.
