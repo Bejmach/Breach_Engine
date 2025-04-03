@@ -1,21 +1,22 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include "Tokenizer.h"
 #include <vector>
 #include<StringDict.h>
 
 struct OrderTree{
-	OrderTree(Element _root = {"", ""}, OrderTree* _parent = nullptr);
+	OrderTree(Token _root = {TokenType::Undefined, ""}, OrderTree* _parent = nullptr);
 	~OrderTree();
 	void Print(int spaces = 0);
 
 	OrderTree* parent;
-	Element root;
+	Token root;
 	std::vector<OrderTree*> childs;
 };
 
 namespace par{
-	OrderTree* Parse(std::vector<Element> elements);
+	OrderTree* Parse(std::vector<Token> tokens);
 }
 
 #endif

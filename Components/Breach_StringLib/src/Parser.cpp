@@ -1,7 +1,8 @@
 #include "StringDict.h"
+#include "Tokenizer.h"
 #include <Parser.h>
 
-OrderTree::OrderTree(Element _root, OrderTree* _parent){
+OrderTree::OrderTree(Token _root, OrderTree* _parent){
 	root = _root;
 	parent = _parent;
 }
@@ -9,7 +10,7 @@ void OrderTree::Print(int spaces){
 	for(int i=0; i<spaces; i++){
 		std::cout<<"  ";
 	}
-	std::cout<<this->root.key<<"{";
+	std::cout<<this->root.value<<"{";
 	for(int i=0; i<this->childs.size(); i++){
 		std::cout<<std::endl;
 		childs[i]->Print(spaces+1);
@@ -21,28 +22,22 @@ void OrderTree::Print(int spaces){
 	std::cout<<"}";
 }
 
-OrderTree* par::Parse(std::vector<Element> elements){
-	OrderTree* tree = new OrderTree();
+OrderTree* par::Parse(std::vector<Token> tokens){
+	/*OrderTree* tree = new OrderTree();
 	tree->parent = nullptr;
-	tree->root = {"root", "root"};
+	tree->root = {TokenType::Undefined, "root"};
 	OrderTree* currentRoot = tree;
-	for(int i=0; i<elements.size(); i++){
-		/*std::cout<<currentRoot->root.value<<":"<<currentRoot->root.key<<std::endl;
-		std::cout<<elements[i].value<<":"<<elements[i].key<<std::endl;
-		std::cout<<std::endl;*/
-		if(elements[i].value == "parameter" || elements[i].value == "funcInit" ||
-				elements[i].value == "open" || elements[i].value == "cOpen" ||
-				elements[i].value == "comOpen" || elements[i].value == "loop" ||
-				elements[i].value == "func" || elements[i].value == "return" ||
-				elements[i].value == "lf"){
+	for(int i=0; i<tokens.size(); i++){
+		if(tokens[i].type == TokenType::Keyword || tokens[i].type == TokenType::Type || tokens[i].type == TokenType::Delimiter){
 			OrderTree* typeTree = new OrderTree();
 			typeTree->parent = currentRoot;
 			typeTree->root = elements[i];
 			currentRoot->childs.push_back(typeTree);
-			currentRoot = typeTree;
+			if(tokens[i].value != "break" ||){ 
+				currentRoot = typeTree;
+			}
 		}
-		else if(elements[i].value == "op" || elements[i].value == "bOp" ||
-				elements[i].value == "lOp" || elements[i].value == "local"){
+		else if(elements[i].value == "LITERAL"){
 			OrderTree* typeTree = new OrderTree();
 			typeTree->parent = currentRoot;
 			typeTree->root = elements[i];
@@ -87,7 +82,7 @@ OrderTree* par::Parse(std::vector<Element> elements){
 				currentRoot = currentRoot->parent;
 			}
 		}
-	}
+	}*/
 
-	return tree;
+	return nullptr;
 }

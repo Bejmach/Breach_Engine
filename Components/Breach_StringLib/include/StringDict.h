@@ -27,37 +27,74 @@ struct ParsedElement{
 	std::vector<Element> elements;
 };
 
-struct Dict{
-	Dict *left;
-	Dict *right;
+struct BTNode{
+	BTNode *left;
+	BTNode *right;
 
 	int id;
 	std::vector<Element> elements;
 
-	Dict(ParsedElement element) : id(element.id), elements(element.elements), left(nullptr), right(nullptr){}
-	Dict(){};
-	~Dict();
+	BTNode(ParsedElement element) : id(element.id), elements(element.elements), left(nullptr), right(nullptr){}
+	BTNode(){};
+	~BTNode();
+};
+
+//Extended Binary Tree
+struct EBTNode{
+	char ch;
+	std::string value = "";
+
+	EBTNode *left = nullptr;
+	EBTNode *right = nullptr;
+	EBTNode *nextTree = nullptr;
+
+	unsigned char height = 0;
+
+	EBTNode(char c): ch(c){}
+
 };
 
 class strd{
 	private:
 		static std::vector<PreElement> PrepareData(std::string data);
+		static std::vector<Element> PrepareRawData(std::string data);
 		static int Partition(std::vector<PreElement>& arr, int low, int high);
 		static void QuickSort(std::vector<PreElement>& arr, int low, int high);
 		static void SortElements(std::vector<PreElement>& elements);
 		static std::vector<ParsedElement> ParseElements(std::vector<PreElement> elements);
-		static Dict* BuildBalancedTree(const std::vector<ParsedElement>& elements, int start, int end);
+		static BTNode* BuildBalancedTree(const std::vector<ParsedElement>& elements, int start, int end);
 
 	public:
-		static Dict* CreateBTree(std::string data);
+		static BTNode* CreateBTree(std::string data);
 		static std::vector<Element> CreateList(std::string data);
 		static std::unordered_map<std::string, std::string> CreateUM(std::string data);
-		static void InorderTraversal(Dict* root);
-		static Element* Find(Dict* root, std::string key);
+		static void InorderTraversal(BTNode* root);
+		static Element* Find(BTNode* root, std::string key);
 		static Element Find(std::vector<Element> root, std::string key);
 		static std::string Find(std::unordered_map<std::string, std::string> root, std::string key);
 
+<<<<<<< HEAD
 		static void Add(Dict* root, Element element);
+=======
+		static void Add(BTNode* root, Element element);
+
+		//Extended Binary Tree
+		static EBTNode* CreateEBTree(std::string data);
+		
+		static void UpdateHeight(EBTNode* node);
+		static int GetHeight(EBTNode* node);
+		static int GetBalanceFactor(EBTNode* node);
+
+		static EBTNode* RotateRight(EBTNode* y);
+		static EBTNode* RotateLeft(EBTNode* y);
+
+		static EBTNode* InsertChar(EBTNode*, char ch);
+		static EBTNode* InsertElement(EBTNode*, Element element);
+
+		static std::string GetValue(EBTNode* root, std::string key);
+		static EBTNode* GetNode(EBTNode* root, std::string key);
+		static std::vector<std::string> CollectWords(EBTNode* root, std::string prefix);
+>>>>>>> d3f45d1 (extended binary tree not working)
 };
 
 #endif

@@ -5,7 +5,7 @@
 #include <ostream>
 #include <sstream>
 
-Element* tok::DictFind(std::string str, Dict* dictionary){
+Element* tok::DictFind(std::string str, BTNode* dictionary){
 	return strd::Find(dictionary, str);
 }
 
@@ -42,7 +42,7 @@ Token tok::ToToken(Element element){
 	return token;
 }
 
-std::vector<Token> tok::Tokenize(std::string data, Dict* dictionary){
+std::vector<Token> tok::Tokenize(std::string data, BTNode* dictionary){
 	std::vector<Token> tokens;
 
 	std::stringstream stream(data);

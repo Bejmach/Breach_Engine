@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <stack>
 #include <string>
 #include <sstream>
 #include <unordered_map>
@@ -14,7 +15,7 @@ Element PreElement::ToElement(){
 	return element;
 }
 
-Dict::~Dict(){
+BTNode::~BTNode(){
 	if(left!=nullptr){
 		delete left;
 	}
@@ -61,7 +62,43 @@ std::vector<PreElement> strd::PrepareData(std::string data){
 	elements.resize(elements.size()-1-emptyLines);
 	return elements;
 }
+std::vector<Element> strd::PrepareRawData(std::string data){
+	
+	std::istringstream stream(data);
 
+	unsigned int lineCount = std::count(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>(), '\n')+1;
+	std::vector<Element> elements(lineCount);
+
+	stream.clear();
+	stream.seekg(0);
+
+	std::string line;
+	int i=0;
+
+	int emptyLines = 0;
+	while(std::getline(stream, line)){
+		if(line == ""){
+			emptyLines += 1;
+			continue;
+		}
+		Element element;
+		std::vector<std::string> elementValues = stro::Split(line, " ");
+		if(elementValues.size() < 2){
+			std::cout<<"Error on line"<<i<<". File not formated correctly. Line: \""<<line<<"\""<<std::endl;
+			return {};
+		}
+		if(std::isdigit(elementValues[0][0]) || std::isdigit(elementValues[1][0])){
+			std::cout<<"Error on line"<<i<<". Key or Value Can't start from number and symbols. Line: \""<<line<<"\""<<std::endl;
+			return {};
+		}
+		element.key = elementValues[0];
+		element.value = elementValues[1];
+		elements[i] = element;
+		i+=1;
+	}
+	elements.resize(elements.size()-1-emptyLines);
+	return elements;
+}
 // Partition function for QuickSort
 int strd::Partition(std::vector<PreElement>& arr, int low, int high) {
     int pivot = arr[high].id;  // Choosing the last element as pivot
@@ -120,11 +157,11 @@ std::vector<ParsedElement> strd::ParseElements(std::vector<PreElement> elements)
 }
 
 // Function to build a balanced BST from a sorted vector of ParsedElements
-Dict* strd::BuildBalancedTree(const std::vector<ParsedElement>& elements, int start, int end) {
+BTNode* strd::BuildBalancedTree(const std::vector<ParsedElement>& elements, int start, int end) {
     if (start > end) return nullptr;
 
     int mid = start + (end - start) / 2;
-    Dict* root = new Dict(elements[mid]);
+    BTNode* root = new BTNode(elements[mid]);
 
     root->left = BuildBalancedTree(elements, start, mid - 1);
     root->right = BuildBalancedTree(elements, mid + 1, end);
@@ -133,14 +170,14 @@ Dict* strd::BuildBalancedTree(const std::vector<ParsedElement>& elements, int st
 }
 
 // In-order traversal (for testing)
-void strd::InorderTraversal(Dict* root) {
+void strd::InorderTraversal(BTNode* root) {
     if (!root) return;
     InorderTraversal(root->left);
     std::cout << root->id << " ";
     InorderTraversal(root->right);
 }
 
-Dict* strd::CreateBTree(std::string data){
+BTNode* strd::CreateBTree(std::string data){
 	std::vector<PreElement> elementVec = PrepareData(data);
 	SortElements(elementVec);
 	std::vector<ParsedElement> parsedElements = strd::ParseElements(elementVec);
@@ -166,7 +203,7 @@ std::unordered_map<std::string, std::string> strd::CreateUM(std::string data){
 }
 
 
-Element* strd::Find(Dict* root, std::string key){
+Element* strd::Find(BTNode* root, std::string key){
 	int keyId = stro::Value(key);
 
 	while (root){
@@ -205,7 +242,7 @@ std::string strd::Find(std::unordered_map<std::string, std::string> um, std::str
 	return nullptr;
 }
 
-void strd::Add(Dict* root, Element element){
+void strd::Add(BTNode* root, Element element){
 	if(root == nullptr){
 		return;
 	}
@@ -215,10 +252,10 @@ void strd::Add(Dict* root, Element element){
 	while(true){
 		if(root->id<elementValue){
 			if(root->right == nullptr){
-				Dict* newDict = new Dict();
-				newDict->id = elementValue;
-				newDict->elements.push_back(element);
-				root->right = newDict;
+				BTNode* newBTNode = new BTNode();
+				newBTNode->id = elementValue;
+				newBTNode->elements.push_back(element);
+				root->right = newBTNode;
 				return;
 			}
 			else{
@@ -227,10 +264,10 @@ void strd::Add(Dict* root, Element element){
 		}
 		else if(root->id>elementValue){
 			if(root->left == nullptr){
-				Dict* newDict = new Dict();
-				newDict->id = elementValue;
-				newDict->elements.push_back(element);
-				root->left = newDict;
+				BTNode* newBTNode = new BTNode();
+				newBTNode->id = elementValue;
+				newBTNode->elements.push_back(element);
+				root->left = newBTNode;
 				return;
 			}
 			else{
@@ -245,3 +282,151 @@ void strd::Add(Dict* root, Element element){
 }
 
 
+//Extended Binary Tree
+void strd::UpdateHeight(EBTNode* node){
+	if(node){
+		node->height = std::max(GetHeight(node->left), GetHeight(node->right))+1;
+	}
+}
+int strd::GetHeight(EBTNode* node){
+	return node?node->height:0;
+}
+
+int strd::GetBalanceFactor(EBTNode* node){
+	return node?GetHeight(node->left) - GetHeight(node->right) : 0;
+}
+
+EBTNode* strd::RotateRight(EBTNode* y){
+	EBTNode* x = y->left;
+	EBTNode* T2 = x->right;
+
+	x->right = y;
+	x->left = T2;
+
+	UpdateHeight(x);
+	UpdateHeight(y);
+
+	return x;
+}
+
+EBTNode* strd::RotateLeft(EBTNode* x){
+	EBTNode* y = x->right;
+	EBTNode* T2 = y->left;
+
+	y->left = x;
+	x->right = T2;
+
+	UpdateHeight(x);
+	UpdateHeight(y);
+
+	return y;
+}
+
+EBTNode* strd::InsertChar(EBTNode* root, char ch) {
+    if (!root) return new EBTNode(ch);
+    
+    std::vector<EBTNode**> path;  // Keep track of pointers to nodes
+    EBTNode** current = &root;
+
+    while (*current) {
+        path.push_back(current);
+        if (ch < (*current)->ch)
+            current = &((*current)->left);
+        else if (ch > (*current)->ch)
+            current = &((*current)->right);
+        else
+            return root; // Char already exists
+    }
+
+    *current = new EBTNode(ch);
+
+    // Balance tree iteratively
+    for (auto it = path.rbegin(); it != path.rend(); ++it) {
+        EBTNode*& node = **it;
+        UpdateHeight(node);
+        int balance = GetBalanceFactor(node);
+
+        if (balance > 1) {
+            if (GetBalanceFactor(node->left) < 0)
+                node->left = RotateLeft(node->left);
+            node = RotateRight(node);
+        }
+        if (balance < -1) {
+            if (GetBalanceFactor(node->right) > 0)
+                node->right = RotateRight(node->right);
+            node = RotateLeft(node);
+        }
+    }
+
+    return root;
+}
+EBTNode* strd::InsertElement(EBTNode* root, Element element) {
+	std::string word = element.key;
+    if (!root) root = new EBTNode(word[0]);
+    EBTNode* node = root;
+
+    for (int i=0; i<word.size(); i++) {
+        node = InsertChar(node, word[i]);
+        if (!node->nextTree)
+            node->nextTree = new EBTNode('\0');  // Create next level node
+        node = node->nextTree;
+    }
+    node->value = element.value;
+    return root;
+}
+std::string strd::GetValue(EBTNode* root, std::string key) {
+    EBTNode* node = root;
+    for (int i=0; i<key.size(); i++) {
+        while (node && node->ch != key[i])
+            node = (key[i] < node->ch) ? node->left : node->right;
+        if (!node) return "";
+        node = node->nextTree;
+    }
+    return node ? node->value : "";
+}
+EBTNode* strd::GetNode(EBTNode* root, std::string key) {
+    EBTNode* node = root;
+    for (int i=0; i<key.size(); i++) {
+        while (node && node->ch != key[i])
+            node = (key[i] < node->ch) ? node->left : node->right;
+        if (!node) return node;
+        node = node->nextTree;
+    }
+    return node;
+}
+
+// Iterative traversal to collect words
+std::vector<std::string> strd::CollectWords(EBTNode* root, std::string prefix) {
+	root = GetNode(root, prefix);
+    std::vector<std::string> words;
+    if (!root) return words;
+
+    std::stack<std::pair<EBTNode*, std::string>> stack;
+    stack.push({root, ""});
+
+    while (!stack.empty()) {
+        auto [node, prefix] = stack.top();
+        stack.pop();
+
+        while (node) {
+            std::string new_prefix = prefix;
+            if (node->ch != '\0') new_prefix += node->ch;
+
+            if (node->value!="") words.push_back(new_prefix);
+
+            if (node->right) stack.push({node->right, prefix});
+            if (node->nextTree) stack.push({node->nextTree, new_prefix});
+            node = node->left;
+        }
+    }
+
+    return words;
+}
+
+EBTNode* strd::CreateEBTree(std::string data) {
+	std::vector<Element> elements = strd::PrepareRawData(data);
+    EBTNode* root = nullptr;
+    for (int i=0; i<elements.size(); i++)
+        root = InsertElement(root, elements[i]);
+    return root;
+}

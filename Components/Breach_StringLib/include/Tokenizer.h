@@ -12,11 +12,11 @@ struct Token{
 
 class tok{
 	private:
-		static Element* DictFind(std::string str, Dict* dictionary);
+		static Element* DictFind(std::string str, BTNode* dictionary);
 		static Token ToToken(Element);
 
 	public:
-		static std::vector<Token> Tokenize(std::string str, Dict* dictionary);
+		static std::vector<Token> Tokenize(std::string str, BTNode* dictionary);
 
 };
 
