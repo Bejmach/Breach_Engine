@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(MAIN src/main.cpp)
 
-set(SOURCES src/TokenizerTest.cpp
+set(SOURCES src/DictTest.cpp
 	Dependencies/glad/src/glad.c)
 
 # Components include

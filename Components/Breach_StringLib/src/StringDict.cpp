@@ -281,152 +281,50 @@ void strd::Add(BTNode* root, Element element){
 	}
 }
 
+ExtendedMap strd::CreateExtendedMap(std::string data){
+	ExtendedMap map;
 
-//Extended Binary Tree
-void strd::UpdateHeight(EBTNode* node){
-	if(node){
-		node->height = std::max(GetHeight(node->left), GetHeight(node->right))+1;
+	std::vector<Element> elements = PrepareRawData(data);
+	for(int i=0; i<elements.size(); i++){
+		AddElement(&map, elements[i]);
 	}
-}
-int strd::GetHeight(EBTNode* node){
-	return node?node->height:0;
+	return map;
 }
 
-int strd::GetBalanceFactor(EBTNode* node){
-	return node?GetHeight(node->left) - GetHeight(node->right) : 0;
+ExtendedMap* strd::AddChar(ExtendedMap* node, char ch, std::string value){
+	if(node->map.find(ch)==node->map.end()){
+		ExtendedMap* newMap = new ExtendedMap(value);
+		node->map.insert({ch, newMap});
+		return newMap;
+	}
+	return nullptr;
+}
+void strd::AddElement(ExtendedMap* root, Element element){
+	ExtendedMap* node = root;
+	for(int i=0; i<element.key.size(); i++){
+		auto mapFound = node->map.find(element.key[i]);
+		if(mapFound!=node->map.end()){
+			node = mapFound->second;
+		}
+		else{
+			node = AddChar(node, element.key[i]);
+		}
+	}
+	node->value = element.value;
+}
+std::string strd::FindValue(ExtendedMap* root, std::string key){
+	ExtendedMap* node = root;
+	for(int i=0; i<key.size(); i++){
+		auto mapFound = node->map.find(key[i]);
+		if(mapFound!=node->map.end()){
+			node = mapFound->second;
+		}
+		else{
+			return "null";
+		}
+	}
+	return node->value;
 }
 
-EBTNode* strd::RotateRight(EBTNode* y){
-	EBTNode* x = y->left;
-	EBTNode* T2 = x->right;
 
-	x->right = y;
-	x->left = T2;
 
-	UpdateHeight(x);
-	UpdateHeight(y);
-
-	return x;
-}
-
-EBTNode* strd::RotateLeft(EBTNode* x){
-	EBTNode* y = x->right;
-	EBTNode* T2 = y->left;
-
-	y->left = x;
-	x->right = T2;
-
-	UpdateHeight(x);
-	UpdateHeight(y);
-
-	return y;
-}
-
-EBTNode* strd::InsertChar(EBTNode* root, char ch) {
-    if (!root) return new EBTNode(ch);
-    
-    std::vector<EBTNode**> path;  // Keep track of pointers to nodes
-    EBTNode** current = &root;
-
-    while (*current) {
-        path.push_back(current);
-        if (ch < (*current)->ch)
-            current = &((*current)->left);
-        else if (ch > (*current)->ch)
-            current = &((*current)->right);
-        else
-            return root; // Char already exists
-    }
-
-    *current = new EBTNode(ch);
-
-    // Balance tree iteratively
-    for (auto it = path.rbegin(); it != path.rend(); ++it) {
-        EBTNode*& node = **it;
-        UpdateHeight(node);
-        int balance = GetBalanceFactor(node);
-
-        if (balance > 1) {
-            if (GetBalanceFactor(node->left) < 0)
-                node->left = RotateLeft(node->left);
-            node = RotateRight(node);
-        }
-        if (balance < -1) {
-            if (GetBalanceFactor(node->right) > 0)
-                node->right = RotateRight(node->right);
-            node = RotateLeft(node);
-        }
-    }
-
-    return root;
-}
-EBTNode* strd::InsertElement(EBTNode* root, Element element) {
-	std::string word = element.key;
-    if (!root) root = new EBTNode(word[0]);
-    EBTNode* node = root;
-
-    for (int i=0; i<word.size(); i++) {
-        node = InsertChar(node, word[i]);
-        if (!node->nextTree)
-            node->nextTree = new EBTNode('\0');  // Create next level node
-        node = node->nextTree;
-    }
-    node->value = element.value;
-    return root;
-}
-std::string strd::GetValue(EBTNode* root, std::string key) {
-    EBTNode* node = root;
-    for (int i=0; i<key.size(); i++) {
-        while (node && node->ch != key[i])
-            node = (key[i] < node->ch) ? node->left : node->right;
-        if (!node) return "";
-        node = node->nextTree;
-    }
-    return node ? node->value : "";
-}
-EBTNode* strd::GetNode(EBTNode* root, std::string key) {
-    EBTNode* node = root;
-    for (int i=0; i<key.size(); i++) {
-        while (node && node->ch != key[i])
-            node = (key[i] < node->ch) ? node->left : node->right;
-        if (!node) return node;
-        node = node->nextTree;
-    }
-    return node;
-}
-
-// Iterative traversal to collect words
-std::vector<std::string> strd::CollectWords(EBTNode* root, std::string prefix) {
-	root = GetNode(root, prefix);
-    std::vector<std::string> words;
-    if (!root) return words;
-
-    std::stack<std::pair<EBTNode*, std::string>> stack;
-    stack.push({root, ""});
-
-    while (!stack.empty()) {
-        auto [node, prefix] = stack.top();
-        stack.pop();
-
-        while (node) {
-            std::string new_prefix = prefix;
-            if (node->ch != '\0') new_prefix += node->ch;
-
-            if (node->value!="") words.push_back(new_prefix);
-
-            if (node->right) stack.push({node->right, prefix});
-            if (node->nextTree) stack.push({node->nextTree, new_prefix});
-            node = node->left;
-        }
-    }
-
-    return words;
-}
-
-EBTNode* strd::CreateEBTree(std::string data) {
-	std::vector<Element> elements = strd::PrepareRawData(data);
-    EBTNode* root = nullptr;
-    for (int i=0; i<elements.size(); i++)
-        root = InsertElement(root, elements[i]);
-    return root;
-}

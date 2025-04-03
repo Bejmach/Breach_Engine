@@ -39,19 +39,11 @@ struct BTNode{
 	~BTNode();
 };
 
-//Extended Binary Tree
-struct EBTNode{
-	char ch;
+struct ExtendedMap{
 	std::string value = "";
 
-	EBTNode *left = nullptr;
-	EBTNode *right = nullptr;
-	EBTNode *nextTree = nullptr;
-
-	unsigned char height = 0;
-
-	EBTNode(char c): ch(c){}
-
+	std::unordered_map<char, ExtendedMap*> map;
+	ExtendedMap(std::string value = ""): value(value){}
 };
 
 class strd{
@@ -73,28 +65,13 @@ class strd{
 		static Element Find(std::vector<Element> root, std::string key);
 		static std::string Find(std::unordered_map<std::string, std::string> root, std::string key);
 
-<<<<<<< HEAD
-		static void Add(Dict* root, Element element);
-=======
+
 		static void Add(BTNode* root, Element element);
 
-		//Extended Binary Tree
-		static EBTNode* CreateEBTree(std::string data);
-		
-		static void UpdateHeight(EBTNode* node);
-		static int GetHeight(EBTNode* node);
-		static int GetBalanceFactor(EBTNode* node);
-
-		static EBTNode* RotateRight(EBTNode* y);
-		static EBTNode* RotateLeft(EBTNode* y);
-
-		static EBTNode* InsertChar(EBTNode*, char ch);
-		static EBTNode* InsertElement(EBTNode*, Element element);
-
-		static std::string GetValue(EBTNode* root, std::string key);
-		static EBTNode* GetNode(EBTNode* root, std::string key);
-		static std::vector<std::string> CollectWords(EBTNode* root, std::string prefix);
->>>>>>> d3f45d1 (extended binary tree not working)
+		static ExtendedMap CreateExtendedMap(std::string data);
+		static ExtendedMap* AddChar(ExtendedMap* node, char ch, std::string value = "");
+		static void AddElement(ExtendedMap* root, Element element);
+		static std::string FindValue(ExtendedMap* root, std::string key);
 };
 
 #endif
