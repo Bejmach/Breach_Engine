@@ -57,7 +57,7 @@ class strd{
 		static Element Find(std::vector<Element> root, std::string key);
 		static std::string Find(std::unordered_map<std::string, std::string> root, std::string key);
 
-		void Add(Dict* root, Element element);
+		static void Add(Dict* root, Element element);
 };
 
 #endif
