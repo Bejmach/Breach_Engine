@@ -312,7 +312,8 @@ void strd::AddElement(ExtendedMap* root, Element element){
 	}
 	node->value = element.value;
 }
-std::string strd::FindValue(ExtendedMap* root, std::string key){
+
+ExtendedMap* strd::GetNode(ExtendedMap* root, std::string key){
 	ExtendedMap* node = root;
 	for(int i=0; i<key.size(); i++){
 		auto mapFound = node->map.find(key[i]);
@@ -320,11 +321,58 @@ std::string strd::FindValue(ExtendedMap* root, std::string key){
 			node = mapFound->second;
 		}
 		else{
-			return "null";
+			return nullptr;
 		}
 	}
+	return node;
+}
+std::string strd::FindValue(ExtendedMap* root, std::string key){
+	ExtendedMap* node = GetNode(root, key);
+
+	if(!node){
+		return "";
+	}
+
 	return node->value;
 }
 
+std::vector<Element> strd::CollectAll(ExtendedMap* node, std::string prefix) {
+    std::vector<Element> results;
+    if (node == nullptr) return results;
 
+    std::stack<std::pair<ExtendedMap*, std::string>> stack;
+    stack.push(std::make_pair(node, node->value));
+
+    while (!stack.empty()) {
+        std::pair<ExtendedMap*, std::string> current = stack.top();
+        stack.pop();
+
+        ExtendedMap* node = current.first;
+        std::string path = current.second;
+
+        if (!node->value.empty()) {
+			Element element;
+			element.key = prefix+path;
+			element.value = node->value;
+            results.push_back(element);
+        }
+
+        for (std::unordered_map<char, ExtendedMap*>::iterator it = node->map.begin(); it != node->map.end(); ++it) {
+            char key = it->first;
+            ExtendedMap* child = it->second;
+            std::string newPath = path + key;
+            stack.push(std::make_pair(child, newPath));
+        }
+    }
+
+    return results;
+}
+
+std::vector<Element> strd::FindByPrefix(ExtendedMap* root, std::string prefix){
+	ExtendedMap* node = GetNode(root, prefix);
+	if(!node){
+		return {};
+	}
+	return CollectAll(node, prefix);
+}
 
